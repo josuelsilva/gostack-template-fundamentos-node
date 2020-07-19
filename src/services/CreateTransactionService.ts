@@ -17,10 +17,11 @@ class CreateTransactionService {
   public execute({ title, value, type }: Request): Transaction {
     const { total } = this.transactionsRepository.getBalance();
 
+    if (!['income', 'outcome'].includes(type)) {
+      throw Error('type is invalid.');
+    }
     if (type === 'outcome' && value > total) {
-      throw Error(
-        `Seu saldo é de apenas ${total}. Não será possivel confirmar esta transação.`,
-      );
+      throw Error('Insufficient balance to confirm this transaction.');
     }
 
     const transaction = this.transactionsRepository.create({
